@@ -2,7 +2,7 @@
 
 #make executable .sh
 cd pi-gen
-find ./ -type f -iname "*.sh" -exec chmod +x {} \;
+sudo find ./ -type f -iname "*.sh" -exec chmod +x {} \;
 #make lite img
 
 touch ./stage4/SKIP ./stage5/SKIP
@@ -15,6 +15,8 @@ sudo CONTINUE=1 ./build-docker.sh
 sudo PRESERVE_CONTAINER=1 ./build-docker.sh
 
 sudo PRESERVE_CONTAINER=1 CONTINUE=1 ./build-docker.sh
+
+sudo PRESERVE_CONTAINER=1 CONTINUE=1 CLEAN=1 ./build-docker.sh
 
 
 sudo docker run -it --privileged --volumes-from=pigen_work pi-gen /bin/bash
