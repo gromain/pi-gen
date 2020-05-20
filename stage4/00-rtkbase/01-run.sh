@@ -2,10 +2,12 @@
 
 install -m 644 files/install.sh ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/
 install -m 644 files/sed.sh ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/
+install -m 644 files/unsed.sh ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/
 
 on_chroot << EOF
 cd /home/centipede
 chmod +x sed.sh
+chmod +x unsed.sh
 ./sed.sh
 EOF
 
