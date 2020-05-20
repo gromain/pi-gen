@@ -66,7 +66,8 @@ package_upgrade: false
 runcmd:
   # Pickup the hostname changes
   - 'systemctl restart avahi-daemon'
-  - 'cd /home/centipede && ./install.sh --unit-files --crontab --flash-gnss'
+  - 'cd /home/centipede && ./install.sh --unit-files --crontab --detect-usb-gnss --flash-gnss'
+  - 'cd /home/centipede && ./unsed.sh'
 
 #  # Activate WiFi interface
 #  - 'ifup wlan0'
