@@ -64,7 +64,7 @@ install_rtklib() {
       then 
         rm -rf RTKLIB/
         #Get Rtklib 2.4.3 repository
-        sudo -u centipede git clone -b rtklib_2.4.3 --single-branch https://github.com/tomojitakasu/RTKLIB
+        sudo -u $(logname) git clone -b rtklib_2.4.3 --single-branch https://github.com/tomojitakasu/RTKLIB
         #Install Rtklib app
         #TODO add correct CTARGET in makefile?
         make --directory=RTKLIB/app/str2str/gcc
@@ -85,7 +85,7 @@ install_rtkbase_from_repo() {
     echo 'INSTALLING RTKBASE FROM REPO'
     echo '################################'
       #Get rtkbase repository
-      sudo -u centipede git clone -b web_gui --single-branch https://github.com/stefal/rtkbase.git
+      sudo -u $(logname) git clone -b web_gui --single-branch https://github.com/stefal/rtkbase.git
 }
 
 install_rtkbase_from_release() {
@@ -93,8 +93,8 @@ install_rtkbase_from_release() {
     echo 'INSTALLING RTKBASE FROM REALEASE'
     echo '################################'
       #Get rtkbase latest release
-      sudo -u centipede wget https://github.com/stefal/rtkbase/releases/latest/download/rtkbase.tar.gz -O rtkbase.tar.gz
-      sudo -u centipede tar -xvf rtkbase.tar.gz
+      sudo -u $(logname) wget https://github.com/stefal/rtkbase/releases/latest/download/rtkbase.tar.gz -O rtkbase.tar.gz
+      sudo -u $(logname) tar -xvf rtkbase.tar.gz
 }
 
 rtkbase_requirements(){
@@ -106,7 +106,7 @@ rtkbase_requirements(){
       python3 -m pip install --upgrade pip setuptools wheel  --extra-index-url https://www.piwheels.org/simple
       python3 -m pip install -r rtkbase/web_app/requirements.txt  --extra-index-url https://www.piwheels.org/simple
       #when we will be able to launch the web server without root, we will use
-      #sudo -u centipede python3 -m pip install -r requirements.txt --user.
+      #sudo -u $(logname) python3 -m pip install -r requirements.txt --user.
 }
 
 install_unit_files() {
@@ -114,7 +114,7 @@ install_unit_files() {
     echo 'ADDING UNIT FILES'
     echo '################################'
       #Install unit files
-      /home/centipede/rtkbase/copy_unit.sh
+      /home/$(logname)/rtkbase/copy_unit.sh
       systemctl enable rtkbase_web.service
       systemctl daemon-reload
       systemctl start rtkbase_web.service
@@ -126,8 +126,8 @@ add_crontab() {
     echo '################################'
       #script from https://stackoverflow.com/questions/610839/how-can-i-programmatically-create-a-new-cron-job
       #I've added '-r' to sort because SHELL=/bin/bash should stay before "0 4 * * ..."
-      (crontab -u centipede -l ; echo 'SHELL=/bin/bash') | sort -r | uniq - | crontab -u centipede -
-      (crontab -u centipede -l ; echo "0 4 * * * $(eval echo ~centipede/rtkbase/archive_and_clean.sh)") | sort -r | uniq - | crontab -u centipede -
+      (crontab -u $(logname) -l ; echo 'SHELL=/bin/bash') | sort -r | uniq - | crontab -u $(logname) -
+      (crontab -u $(logname) -l ; echo "0 4 * * * $(eval echo ~$(logname)/rtkbase/archive_and_clean.sh)") | sort -r | uniq - | crontab -u $(logname) -
 }
 
 detect_usb_gnss() {
@@ -158,10 +158,10 @@ flash_gnss(){
         if [[ -f "rtkbase/settings.conf" ]]  #check if settings.conf exists
         then
           #inject the com port inside settings.conf
-          sudo -u centipede sed -i s/com_port=.*/com_port=\'${detected_gnss[0]}\'/ rtkbase/settings.conf
+          sudo -u $(logname) sed -i s/com_port=.*/com_port=\'${detected_gnss[0]}\'/ rtkbase/settings.conf
         else
           #create settings.conf with the com_port setting and the format
-          sudo -u centipede printf "[main]\ncom_port='"${detected_gnss[0]}"'\ncom_port_settings='115200:8:n:1'" > rtkbase/settings.conf
+          sudo -u $(logname) printf "[main]\ncom_port='"${detected_gnss[0]}"'\ncom_port_settings='115200:8:n:1'" > rtkbase/settings.conf
         fi
       fi
       #if the receiver is a U-Blox, launch the set_zed-f9p.sh. This script will reset the F9P and flash it with the corrects settings for rtkbase
