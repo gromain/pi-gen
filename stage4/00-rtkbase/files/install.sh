@@ -4,9 +4,52 @@
 ### RTKBASE INSTALLATION SCRIPT ###
 declare -a detected_gnss
 
+man_help(){
+    echo '################################'
+    echo 'RTKBASE INSTALLATION HELP'
+    echo '################################'
+    echo 'Bash scripts for install a simple gnss base station with a web frontend.'
+    echo ''
+    echo ''
+    echo ''
+    echo '* Before install, connect your gnss receiver to raspberry pi/orange pi/.... with usb or uart.'
+    echo '* Running install script with sudo'
+    echo ''
+    echo '        sudo ./install.sh'
+    echo ''
+    echo 'Options:'
+    echo '        --all'
+    echo '                         Install all dependencies, Rtklib, last release of Rtkbase, services,'
+    echo '                         crontab jobs, detect your GNSS receiver and flash it.'
+    echo ''
+    echo '        --dependencies'
+    echo '                         Install all dependencies like git build-essential python3-pip ...'
+    echo ''
+    echo '        --rtklib'
+    echo '                         Clone RTKlib 2.4.3 from github and compile it.'
+    echo '                         https://github.com/tomojitakasu/RTKLIB/tree/rtklib_2.4.3'
+    echo ''
+    echo '        --rtkbase-release'
+    echo '                         Get last release of RTKBASE:'
+    echo '                         https://github.com/Stefal/rtkbase/releases'
+    echo ''
+    echo '        --rtkbase-repo'
+    echo '                         Clone RTKBASE from github:'
+    echo '                         https://github.com/Stefal/rtkbase/tree/web_gui'
+    echo ''
+    echo '        --unit-files'
+    echo '                         Deploy services.'
+    echo ''
+    echo '        --flash-gnss'
+    echo '                         Detect your GNSS receiver and flash it.'
+    echo ''
+    echo
+
+}
+
 install_dependencies() {
     echo '################################'
-    echo 'INSTALLING DEPENDENCIES!'
+    echo 'INSTALLING DEPENDENCIES'
     echo '################################'
       apt-get update 
       apt-get install -y git build-essential python3-pip python3-dev python3-setuptools python3-wheel libsystemd-dev bc dos2unix
@@ -14,14 +57,14 @@ install_dependencies() {
 
 install_rtklib() {
     echo '################################'
-    echo 'INSTALLING RTKLIB!'
+    echo 'INSTALLING RTKLIB'
     echo '################################'
       # str2str already exist?
       if [ ! -f /usr/local/bin/str2str ]
       then 
         rm -rf RTKLIB/
         #Get Rtklib 2.4.3 repository
-        sudo -u $(logname) git clone -b rtklib_2.4.3 --single-branch https://github.com/tomojitakasu/RTKLIB
+        sudo -u centipede git clone -b rtklib_2.4.3 --single-branch https://github.com/tomojitakasu/RTKLIB
         #Install Rtklib app
         #TODO add correct CTARGET in makefile?
         make --directory=RTKLIB/app/str2str/gcc
@@ -42,13 +85,7 @@ install_rtkbase_from_repo() {
     echo 'INSTALLING RTKBASE FROM REPO'
     echo '################################'
       #Get rtkbase repository
-      sudo -u $(logname) git clone -b web_gui --single-branch https://github.com/stefal/rtkbase.git
-      #as we need to run the web server as root, we need to install the requirements with
-      #the same user
-      python3 -m pip install --upgrade pip setuptools wheel  --extra-index-url https://www.piwheels.org/simple
-      python3 -m pip install -r rtkbase/web_app/requirements.txt  --extra-index-url https://www.piwheels.org/simple
-      #when we will be able to launch the web server without root, we will use
-      #sudo -u $(logname) python3 -m pip install -r requirements.txt --user
+      sudo -u centipede git clone -b web_gui --single-branch https://github.com/stefal/rtkbase.git
 }
 
 install_rtkbase_from_release() {
@@ -56,14 +93,20 @@ install_rtkbase_from_release() {
     echo 'INSTALLING RTKBASE FROM REALEASE'
     echo '################################'
       #Get rtkbase latest release
-      sudo -u $(logname) wget https://github.com/stefal/rtkbase/releases/latest/download/rtkbase.tar.gz -O rtkbase.tar.gz
-      sudo -u $(logname) tar -xvf rtkbase.tar.gz
+      sudo -u centipede wget https://github.com/stefal/rtkbase/releases/latest/download/rtkbase.tar.gz -O rtkbase.tar.gz
+      sudo -u centipede tar -xvf rtkbase.tar.gz
+}
+
+rtkbase_requirements(){
+    echo '################################'
+    echo 'INSTALLING RTKBASE REQUIREMENTS'
+    echo '################################'
       #as we need to run the web server as root, we need to install the requirements with
       #the same user
       python3 -m pip install --upgrade pip setuptools wheel  --extra-index-url https://www.piwheels.org/simple
       python3 -m pip install -r rtkbase/web_app/requirements.txt  --extra-index-url https://www.piwheels.org/simple
       #when we will be able to launch the web server without root, we will use
-      #sudo -u $(logname) python3 -m pip install -r requirements.txt --user.
+      #sudo -u centipede python3 -m pip install -r requirements.txt --user.
 }
 
 install_unit_files() {
@@ -71,7 +114,7 @@ install_unit_files() {
     echo 'ADDING UNIT FILES'
     echo '################################'
       #Install unit files
-      /home/$(logname)/rtkbase/copy_unit.sh
+      /home/centipede/rtkbase/copy_unit.sh
       systemctl enable rtkbase_web.service
       systemctl daemon-reload
       systemctl start rtkbase_web.service
@@ -83,8 +126,8 @@ add_crontab() {
     echo '################################'
       #script from https://stackoverflow.com/questions/610839/how-can-i-programmatically-create-a-new-cron-job
       #I've added '-r' to sort because SHELL=/bin/bash should stay before "0 4 * * ..."
-      (crontab -u $(logname) -l ; echo 'SHELL=/bin/bash') | sort -r | uniq - | crontab -u $(logname) -
-      (crontab -u $(logname) -l ; echo "0 4 * * * $(eval echo ~$(logname)/rtkbase/archive_and_clean.sh)") | sort -r | uniq - | crontab -u $(logname) -
+      (crontab -u centipede -l ; echo 'SHELL=/bin/bash') | sort -r | uniq - | crontab -u centipede -
+      (crontab -u centipede -l ; echo "0 4 * * * $(eval echo ~centipede/rtkbase/archive_and_clean.sh)") | sort -r | uniq - | crontab -u centipede -
 }
 
 detect_usb_gnss() {
@@ -115,10 +158,10 @@ flash_gnss(){
         if [[ -f "rtkbase/settings.conf" ]]  #check if settings.conf exists
         then
           #inject the com port inside settings.conf
-          sudo -u $(logname) sed -i s/com_port=.*/com_port=\'${detected_gnss[0]}\'/ rtkbase/settings.conf
+          sudo -u centipede sed -i s/com_port=.*/com_port=\'${detected_gnss[0]}\'/ rtkbase/settings.conf
         else
           #create settings.conf with the com_port setting and the format
-          sudo -u $(logname) printf "[main]\ncom_port='"${detected_gnss[0]}"'\ncom_port_settings='115200:8:n:1'" > rtkbase/settings.conf
+          sudo -u centipede printf "[main]\ncom_port='"${detected_gnss[0]}"'\ncom_port_settings='115200:8:n:1'" > rtkbase/settings.conf
         fi
       fi
       #if the receiver is a U-Blox, launch the set_zed-f9p.sh. This script will reset the F9P and flash it with the corrects settings for rtkbase
@@ -130,19 +173,33 @@ flash_gnss(){
 
 main() {
   #display parameters
-  echo 'Parameters: ' $@
+  echo 'Installation options: ' $@
   array=($@)
-  #Play install
+  # if no parameters display help
+  if [ -z "$array" ]                  ; then man_help                        ;fi
+  # run intall options
   for i in "${array[@]}"
   do
-    if [ "$i" == "--dependencies" ]   ; then install_dependencies	  ;fi &&
-    if [ "$i" == "--rtklib" ] 	      ; then install_rtklib		  ;fi &&
-    if [ "$i" == "--rtkbase_release" ]; then install_rtkbase_from_release ;fi &&
-    if [ "$i" == "--rtkbase_repo" ]   ; then install_rtkbase_from_repo    ;fi &&
-    if [ "$i" == "--unit-files" ]     ; then install_unit_files	    	  ;fi &&
-    if [ "$i" == "--crontab" ] 	      ; then add_crontab		  ;fi &&
-    if [ "$i" == "--detect_gnss" ]    ; then detect_usb_gnss		  ;fi &&
-    if [ "$i" == "--flash-gnss" ]     ; then flash_gnss		 	  ;fi 
+    if [ "$1" == "--help" ]           ; then man_help                        ;fi
+    if [ "$i" == "--dependencies" ]   ; then install_dependencies	     ;fi
+    if [ "$i" == "--rtklib" ] 	      ; then install_rtklib		     ;fi
+    if [ "$i" == "--rtkbase-release" ]; then install_rtkbase_from_release && \
+					     rtkbase_requirements	     ;fi
+    if [ "$i" == "--rtkbase-repo" ]   ; then install_rtkbase_from_repo    && \
+					     rtkbase_requirements	     ;fi
+    if [ "$i" == "--unit-files" ]     ; then install_unit_files	    	     ;fi
+    if [ "$i" == "--crontab" ] 	      ; then add_crontab		     ;fi
+    if [ "$i" == "--flash-gnss" ]     ; then detect_usb_gnss		  && \
+					     flash_gnss	    		     ;fi
+    if [ "$i" == "--all" ]            ; then install_dependencies         && \
+					     install_rtklib	          && \
+					     install_rtkbase_from_release && \
+					     rtkbase_requirements	  && \
+					     install_unit_files           && \
+					     add_crontab		  && \
+					     detect_usb_gnss              && \
+					     flash_gnss                      ;fi
+
   done
 }
 

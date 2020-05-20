@@ -15,7 +15,7 @@ chmod +x install.sh
 echo '################################'
 echo 'START INSTALL'
 echo '################################'
-./install.sh --dependencies --rtklib --rtkbase_release
+./install.sh --dependencies --rtklib --rtkbase-release
 echo '################################'
 echo 'INSTALL FINISH'
 echo '################################'
