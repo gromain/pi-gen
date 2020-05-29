@@ -2,6 +2,8 @@
 
 install -m 644 files/first_run.sh ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/
 install -m 644 files/unsed.sh ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/
+install -m 644 files/patch_archive_and_clean_RINEX.sh ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/
+
 
 on_chroot << EOF
 cd /home/${FIRST_USER_NAME}
