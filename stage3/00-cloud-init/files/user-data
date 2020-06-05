@@ -66,8 +66,7 @@ package_upgrade: false
 runcmd:
   # Pickup the hostname changes
   - 'systemctl restart avahi-daemon'
-  - 'cd /home/basegnss && ./install.sh --unit-files --crontab --detect-usb-gnss --configure-gnss && systemctl start str2str_tcp && ./unsed.sh && rm unsed.sh'
-
+  - 'cd /home/basegnss && ./first_boot.sh && rm ./first_boot.sh && systemctl start str2str_tcp'
 
 #  # Activate WiFi interface
 #  - 'ifup wlan0'
