@@ -78,3 +78,7 @@ otg_mode=1
 arm_boost=1
 
 [all]
+
+#enable serial port
+enable_uart=1
+dtoverlay=pi3-miniuart-bt
