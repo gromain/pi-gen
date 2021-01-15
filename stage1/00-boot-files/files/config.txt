@@ -63,3 +63,7 @@ max_framebuffers=2
 
 [all]
 #dtoverlay=vc4-fkms-v3d
+
+#enable serial port
+enable_uart=1
+dtoverlay=pi3-miniuart-bt
