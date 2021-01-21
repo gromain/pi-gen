@@ -9,6 +9,11 @@ touch ./stage4/SKIP ./stage5/SKIP
 touch ./stage4/SKIP_IMAGES ./stage5/SKIP_IMAGES
 
 
+docker rm -v pigen_work
+
+#apt_proxy docker-compose up -d
+docker-compose up -d
+
 sudo ./build-docker.sh 
 sudo CONTINUE=1 ./build-docker.sh
 
