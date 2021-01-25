@@ -19,8 +19,8 @@ runcmd:
   - cd /home/basegnss && ./first_boot.sh && rm ./first_boot.sh && systemctl start str2str_tcp
 
 bootcmd:
-  - pyaccesspoint -ip 192.168.45.1 -s BaseGNSS -p 12345678 start
-  - wpa_supplicant -B -Dnl80211,wext -c/etc/wpa_supplicant/wpa_supplicant.conf -iwlan0
+  - pyaccesspoint -i eth0 -ip 192.168.45.1 -s BaseGNSS -p 12345678 start
+  - while [ ! -f /var/lib/cloud/instance/boot-finished ]; do pyaccesspoint stop;  pyaccesspoint -i eth0 -ip 192.168.45.1 -s BaseGNSS -p 12345678 start; done;
 
 final_message: "BaseGNSS OK"
 
