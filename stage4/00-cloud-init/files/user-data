@@ -18,14 +18,4 @@ runcmd:
   - rfkill unblock all
   - cd /home/basegnss && ./first_boot.sh && rm ./first_boot.sh && systemctl start str2str_tcp
 
-bootcmd:
-  - pyaccesspoint -i eth0 -ip 192.168.45.1 -s BaseGNSS -p 12345678 start
-  - while [ ! -f /var/lib/cloud/instance/boot-finished ]; do pyaccesspoint stop;  pyaccesspoint -i eth0 -ip 192.168.45.1 -s BaseGNSS -p 12345678 start; done;
-
 final_message: "BaseGNSS OK"
-
-power_state:
-  mode: reboot
-  message: I'll be back !!!
-  timeout: 20
-  condition: True

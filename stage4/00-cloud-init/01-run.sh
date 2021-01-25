@@ -3,7 +3,7 @@
 install -m 644 files/user-data ${ROOTFS_DIR}/boot/
 install -m 644 files/meta-data ${ROOTFS_DIR}/boot/
 install -m 644 files/cloud/cloud.cfg ${ROOTFS_DIR}/etc/cloud/
-#install -m 644 files/wpa_supplicant.conf ${ROOTFS_DIR}/boot/
+install -m 644 files/wpa_supplicant.conf ${ROOTFS_DIR}/boot/
 
 on_chroot << EOF
 echo 'Get cloud-init'
