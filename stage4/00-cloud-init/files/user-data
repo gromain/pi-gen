@@ -19,3 +19,4 @@ runcmd:
   - cd /home/basegnss && ./first_boot.sh && rm ./first_boot.sh && systemctl start str2str_tcp
 
 final_message: "BaseGNSS OK"
+
