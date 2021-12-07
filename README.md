@@ -120,6 +120,10 @@ The following environment variables are supported:
 
    Setting to `0` will deploy the actual image (`.img`) instead of a zipped image (`.zip`).
 
+ * `DEPLOY_GZ` (Default: `0`)
+
+   Setting to `1` will create a gzipped image (`img.gz`). Doesn't work if `DEPLOY_ZIP=1`.
+
  * `USE_QEMU` (Default: `"0"`)
 
    Setting to '1' enables the QEMU mode - creating an image that can be mounted via QEMU for an emulated
