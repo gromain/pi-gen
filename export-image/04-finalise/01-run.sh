@@ -102,4 +102,7 @@ if [ "${DEPLOY_ZIP}" == "1" ]; then
 	popd > /dev/null
 else
 	mv "$IMG_FILE" "$DEPLOY_DIR/"
+	if [ "${DEPLOY_GZ}" == "1" ]; then
+		pigz -f9 "${DEPLOY_DIR}/${IMG_FILENAME}${IMG_SUFFIX}.img"
+	fi
 fi
