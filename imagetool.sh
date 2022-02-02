@@ -5,7 +5,7 @@ if [ "$(id -u)" != "0" ]; then
 		exit 1
 fi
 
-progname=$(basename $0)
+progname=$(basename "$0")
 
 function usage()
 {
@@ -37,12 +37,12 @@ MOUNTPOINT=""
 
 nbd_cleanup() {
 	DEVS="$(lsblk | grep nbd | grep disk | cut -d" " -f1)"
-	if [ ! -z "${DEVS}" ]; then
+	if [ -n "${DEVS}" ]; then
 		for d in $DEVS; do
-			if [ ! -z "${d}" ]; then
-				QDEV="$(ps xa | grep $d | grep -v grep)"
+			if [ -n "${d}" ]; then
+				QDEV="$(pgrep "$d")"
 				if [ -z "${QDEV}" ]; then
-					kpartx -d /dev/$d && echo "Unconnected device map removed: /dev/$d"
+					kpartx -d "/dev/$d" && echo "Unconnected device map removed: /dev/$d"
 				fi
 			fi
 		done
@@ -90,7 +90,7 @@ if [ "${MOUNT}" = "1" ] && [ "${UMOUNT}" = "1" ]; then
 	exit
 fi
 
-if [ "${MOUNT}" = "1" ] && ([ -z "${IMAGE}"  ] || [ -z "${MOUNTPOINT}"  ]); then
+if [ "${MOUNT}" = "1" ] && { [ -z "${IMAGE}"  ] || [ -z "${MOUNTPOINT}"  ]; }; then
 	usage
 	echo "Can not mount image. Image path and/or mount point missing."
 	exit
