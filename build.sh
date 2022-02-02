@@ -74,14 +74,14 @@ EOF
 			popd > /dev/null
 			log "End ${SUB_STAGE_DIR}/${i}-patches"
 		fi
-		if [ -x ${i}-run.sh ]; then
+		if [ -x "${i}-run.sh" ]; then
 			log "Begin ${SUB_STAGE_DIR}/${i}-run.sh"
-			./${i}-run.sh
+			./"${i}-run.sh"
 			log "End ${SUB_STAGE_DIR}/${i}-run.sh"
 		fi
-		if [ -f ${i}-run-chroot.sh ]; then
+		if [ -f "${i}-run-chroot.sh" ]; then
 			log "Begin ${SUB_STAGE_DIR}/${i}-run-chroot.sh"
-			on_chroot < ${i}-run-chroot.sh
+			on_chroot < "${i}-run-chroot.sh"
 			log "End ${SUB_STAGE_DIR}/${i}-run-chroot.sh"
 		fi
 	done
@@ -273,6 +273,7 @@ source "${SCRIPT_DIR}/dependencies_check"
 export NO_PRERUN_QCOW2="${NO_PRERUN_QCOW2:-1}"
 export USE_QCOW2="${USE_QCOW2:-0}"
 export BASE_QCOW2_SIZE=${BASE_QCOW2_SIZE:-12G}
+# shellcheck source=scripts/qcow2_handling
 source "${SCRIPT_DIR}/qcow2_handling"
 if [ "${USE_QCOW2}" = "1" ]; then
 	NO_PRERUN_QCOW2=1
@@ -338,18 +339,17 @@ for EXPORT_DIR in ${EXPORT_DIRS}; do
 		FIRST_IMAGE="image-${FIRST_STAGE}.qcow2"
 
 		pushd "${WORK_DIR}" > /dev/null
-		echo "Creating new base "${EXPORT_NAME}.qcow2" from ${FIRST_IMAGE}"
+		echo "Creating new base ${EXPORT_NAME}.qcow2 from ${FIRST_IMAGE}"
 		cp "./${FIRST_IMAGE}" "${EXPORT_NAME}.qcow2"
 
-		ARR=($TMP_LIST)
 		# rebase stage images to new export base
-		for CURR_STAGE in "${ARR[@]}"; do
+		for CURR_STAGE in $TMP_LIST; do
 			if [ "${CURR_STAGE}" = "${FIRST_STAGE}" ]; then
 				PREV_IMG="${EXPORT_NAME}"
 				continue
 			fi
 		echo "Rebasing image-${CURR_STAGE}.qcow2 onto ${PREV_IMG}.qcow2"
-			qemu-img rebase -f qcow2 -u -b ${PREV_IMG}.qcow2 image-${CURR_STAGE}.qcow2
+			qemu-img rebase -f qcow2 -u -b "${PREV_IMG}.qcow2" "image-${CURR_STAGE}.qcow2"
 			if [ "${CURR_STAGE}" = "${EXPORT_STAGE}" ]; then
 				break
 			fi
@@ -358,16 +358,16 @@ for EXPORT_DIR in ${EXPORT_DIRS}; do
 
 		# commit current export stage into base export image
 		echo "Committing image-${EXPORT_STAGE}.qcow2 to ${EXPORT_NAME}.qcow2"
-		qemu-img commit -f qcow2 -p -b "${EXPORT_NAME}.qcow2" image-${EXPORT_STAGE}.qcow2
+		qemu-img commit -f qcow2 -p -b "${EXPORT_NAME}.qcow2" "image-${EXPORT_STAGE}.qcow2"
 
 		# rebase stage images back to original first stage for easy re-run
-		for CURR_STAGE in "${ARR[@]}"; do
+		for CURR_STAGE in $TMP_LIST; do
 			if [ "${CURR_STAGE}" = "${FIRST_STAGE}" ]; then
 				PREV_IMG="image-${CURR_STAGE}"
 				continue
 			fi
 		echo "Rebasing back image-${CURR_STAGE}.qcow2 onto ${PREV_IMG}.qcow2"
-			qemu-img rebase -f qcow2 -u -b ${PREV_IMG}.qcow2 image-${CURR_STAGE}.qcow2
+			qemu-img rebase -f qcow2 -u -b "${PREV_IMG}.qcow2" "image-${CURR_STAGE}.qcow2"
 			if [ "${CURR_STAGE}" = "${EXPORT_STAGE}" ]; then
 				break
 			fi
