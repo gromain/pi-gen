@@ -42,7 +42,7 @@ if test -z "${CONFIG_FILE}"; then
 	exit 1
 else
 	# shellcheck disable=SC1090
-	source ${CONFIG_FILE}
+	source "${CONFIG_FILE}"
 fi
 
 CONTAINER_NAME=${CONTAINER_NAME:-pigen_work}
@@ -88,6 +88,7 @@ ${DOCKER} build --build-arg BASE_IMAGE=${BASE_IMAGE} -t pi-gen "${DIR}"
 
 if [ "${CONTAINER_EXISTS}" != "" ]; then
 	trap 'echo "got CTRL+C... please wait 5s" && ${DOCKER} stop -t 5 ${CONTAINER_NAME}_cont' SIGINT SIGTERM
+	# shellcheck disable=SC2086
 	time ${DOCKER} run --rm --privileged \
 		--cap-add=ALL \
 		-v /dev:/dev \
@@ -105,6 +106,7 @@ if [ "${CONTAINER_EXISTS}" != "" ]; then
 	wait "$!"
 else
 	trap 'echo "got CTRL+C... please wait 5s" && ${DOCKER} stop -t 5 ${CONTAINER_NAME}' SIGINT SIGTERM
+	# shellcheck disable=SC2086
 	time ${DOCKER} run --name "${CONTAINER_NAME}" --privileged \
 		--cap-add=ALL \
 		-v /dev:/dev \
