@@ -1,0 +1,10 @@
+dhcpcd5 
+lighttpd
+git
+hostapd
+dnsmasq
+iptables-persistent
+vnstat
+qrencode
+php7.3-cgi
+
